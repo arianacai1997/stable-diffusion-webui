@@ -444,6 +444,7 @@ def prepare_environment():
     if "--exit" in sys.argv:
         print("Exiting because of --exit argument")
         exit(0)
+    print("finished preparing env")
 
 
 def configure_for_tests():

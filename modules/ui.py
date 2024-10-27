@@ -796,7 +796,13 @@ def create_ui():
             )
 
             toprow.prompt.submit(**img2img_args)
-            toprow.submit.click(**img2img_args)
+            # toprow.submit.click(**img2img_args)
+            def call_posterior():
+                print("========calling posterier")
+                os.system("proxychains python3.10 /NEW_EDS/JJ_Group/lthpc/diffusers-Diffusion-Posterior-Sampling/main.py --data /NEW_EDS/JJ_Group/lthpc/diffusers-Diffusion-Posterior-Sampling/example_imgs --out /NEW_EDS/JJ_Group/lthpc/diffusers-Diffusion-Posterior-Sampling/example_outputs/dps/srx8 --scale 4.8 --algo dps --operator srx8 --nstep 500 --model stabilityai/stable-diffusion-2-base")
+                print("========finished calling posterier")
+                
+            toprow.submit.click(fn=call_posterior)
 
             res_switch_btn.click(fn=None, _js="function(){switchWidthHeight('img2img')}", inputs=None, outputs=None, show_progress=False)
 
@@ -881,7 +887,8 @@ def create_ui():
                 generation_info = gr.Textbox(visible=False, elem_id="pnginfo_generation_info")
                 html2 = gr.HTML()
                 with gr.Row():
-                    buttons = parameters_copypaste.create_buttons(["txt2img", "img2img", "inpaint", "extras"])
+                    rows = ["txt2img", "img2img", "inpaint", "extras"]
+                    buttons = parameters_copypaste.create_buttons(["img2img"])
 
                 for tabname, button in buttons.items():
                     parameters_copypaste.register_paste_params_button(parameters_copypaste.ParamBinding(

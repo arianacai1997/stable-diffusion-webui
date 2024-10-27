@@ -10,9 +10,11 @@ from modules import initialize
 startup_timer = timer.startup_timer
 startup_timer.record("launcher")
 
-initialize.imports()
+print("initialize imports start")
 
-initialize.check_versions()
+# initialize.imports()
+print("initialize imports done")
+# initialize.check_versions()
 
 
 def create_api(app):
@@ -24,6 +26,7 @@ def create_api(app):
 
 
 def api_only():
+    print("webui.api_only")
     from fastapi import FastAPI
     from modules.shared_cmd_options import cmd_opts
 
@@ -46,6 +49,7 @@ def api_only():
 
 
 def webui():
+    print("webui.webui")
     from modules.shared_cmd_options import cmd_opts
 
     launch_api = cmd_opts.api

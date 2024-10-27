@@ -18,6 +18,8 @@ function dropReplaceImage(imgWrap, files) {
             if (files.length === 0) {
                 files = new DataTransfer();
                 files.items.add(tmpFile);
+                print("!!!!!!!!")
+                print(files)
                 fileInput.files = files.files;
             } else {
                 fileInput.files = files;

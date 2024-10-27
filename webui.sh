@@ -49,7 +49,10 @@ fi
 if [[ ! -x "$(command -v "${python_cmd}")" ]]
 then
   python_cmd="python3"
+  python_cmd = "python3.10"
 fi
+
+
 
 # git executable
 if [[ -z "${GIT}" ]]
@@ -62,7 +65,7 @@ fi
 # python3 venv without trailing slash (defaults to ${install_dir}/${clone_dir}/venv)
 if [[ -z "${venv_dir}" ]] && [[ $use_venv -eq 1 ]]
 then
-    venv_dir="venv"
+    venv_dir="/NEW_EDS/JJ_Group/caixy2406/env/dps"
 fi
 
 if [[ -z "${LAUNCH_SCRIPT}" ]]
@@ -137,12 +140,15 @@ case "$gpu_info" in
             # Using an old nightly compiled against rocm 5.2 for Navi1, see https://github.com/pytorch/pytorch/issues/106728#issuecomment-1749511711
             if [[ $pyv == "3.8" ]]
             then
+                echo "python3.8" "$python_cmd"
                 export TORCH_COMMAND="pip install https://download.pytorch.org/whl/nightly/rocm5.2/torch-2.0.0.dev20230209%2Brocm5.2-cp38-cp38-linux_x86_64.whl https://download.pytorch.org/whl/nightly/rocm5.2/torchvision-0.15.0.dev20230209%2Brocm5.2-cp38-cp38-linux_x86_64.whl"
             elif [[ $pyv == "3.9" ]]
             then
+                echo "python3.9" "$python_cmd"
                 export TORCH_COMMAND="pip install https://download.pytorch.org/whl/nightly/rocm5.2/torch-2.0.0.dev20230209%2Brocm5.2-cp39-cp39-linux_x86_64.whl https://download.pytorch.org/whl/nightly/rocm5.2/torchvision-0.15.0.dev20230209%2Brocm5.2-cp39-cp39-linux_x86_64.whl"
             elif [[ $pyv == "3.10" ]]
             then
+                echo "python3.10" "$python_cmd"
                 export TORCH_COMMAND="pip install https://download.pytorch.org/whl/nightly/rocm5.2/torch-2.0.0.dev20230209%2Brocm5.2-cp310-cp310-linux_x86_64.whl https://download.pytorch.org/whl/nightly/rocm5.2/torchvision-0.15.0.dev20230209%2Brocm5.2-cp310-cp310-linux_x86_64.whl"
             else
                 printf "\e[1m\e[31mERROR: RX 5000 series GPUs python version must be between 3.8 and 3.10, aborting...\e[0m"
@@ -167,9 +173,11 @@ if ! echo "$gpu_info" | grep -q "NVIDIA";
 then
     if echo "$gpu_info" | grep -q "AMD" && [[ -z "${TORCH_COMMAND}" ]]
     then
+          echo "TOOOOOOORCH"
 	      export TORCH_COMMAND="pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/rocm5.7"
     elif npu-smi info 2>/dev/null
     then
+        echo "Yeeees"
         export TORCH_COMMAND="pip install torch==2.1.0 torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu; pip install torch_npu==2.1.0"
     fi
 fi
@@ -205,35 +213,35 @@ else
     cd "${clone_dir}"/ || { printf "\e[1m\e[31mERROR: Can't cd to %s/%s/, aborting...\e[0m" "${install_dir}" "${clone_dir}"; exit 1; }
 fi
 
-if [[ $use_venv -eq 1 ]] && [[ -z "${VIRTUAL_ENV}" ]];
-then
-    printf "\n%s\n" "${delimiter}"
-    printf "Create and activate python venv"
-    printf "\n%s\n" "${delimiter}"
-    cd "${install_dir}"/"${clone_dir}"/ || { printf "\e[1m\e[31mERROR: Can't cd to %s/%s/, aborting...\e[0m" "${install_dir}" "${clone_dir}"; exit 1; }
-    if [[ ! -d "${venv_dir}" ]]
-    then
-        "${python_cmd}" -m venv "${venv_dir}"
-        "${venv_dir}"/bin/python -m pip install --upgrade pip
-        first_launch=1
-    fi
-    # shellcheck source=/dev/null
-    if [[ -f "${venv_dir}"/bin/activate ]]
-    then
-        source "${venv_dir}"/bin/activate
-        # ensure use of python from venv
-        python_cmd="${venv_dir}"/bin/python
-    else
-        printf "\n%s\n" "${delimiter}"
-        printf "\e[1m\e[31mERROR: Cannot activate python venv, aborting...\e[0m"
-        printf "\n%s\n" "${delimiter}"
-        exit 1
-    fi
-else
-    printf "\n%s\n" "${delimiter}"
-    printf "python venv already activate or run without venv: ${VIRTUAL_ENV}"
-    printf "\n%s\n" "${delimiter}"
-fi
+# if [[ $use_venv -eq 1 ]] && [[ -z "${VIRTUAL_ENV}" ]];
+# then
+#     printf "\n%s\n" "${delimiter}"
+#     printf "Create and activate python venv"
+#     printf "\n%s\n" "${delimiter}"
+#     cd "${install_dir}"/"${clone_dir}"/ || { printf "\e[1m\e[31mERROR: Can't cd to %s/%s/, aborting...\e[0m" "${install_dir}" "${clone_dir}"; exit 1; }
+#     if [[ ! -d "${venv_dir}" ]]
+#     then
+#         "${python_cmd}" -m venv "${venv_dir}"
+#         "${venv_dir}"/bin/python -m pip install --upgrade pip
+#         first_launch=1
+#     fi
+#     # shellcheck source=/dev/null
+#     if [[ -f "${venv_dir}"/bin/activate ]]
+#     then
+#         source "${venv_dir}"/bin/activate
+#         # ensure use of python from venv
+#         python_cmd="${venv_dir}"/bin/python
+#     else
+#         printf "\n%s\n" "${delimiter}"
+#         printf "\e[1m\e[31mERROR: Cannot activate python venv, aborting...\e[0m"
+#         printf "\n%s\n" "${delimiter}"
+#         exit 1
+#     fi
+# else
+#     printf "\n%s\n" "${delimiter}"
+#     printf "python venv already activate or run without venv: ${VIRTUAL_ENV}"
+#     printf "\n%s\n" "${delimiter}"
+# fi
 
 # Try using TCMalloc on Linux
 prepare_tcmalloc() {
@@ -295,6 +303,7 @@ while [[ "$KEEP_GOING" -eq "1" ]]; do
         printf "Launching launch.py..."
         printf "\n%s\n" "${delimiter}"
         prepare_tcmalloc
+        echo "============== execute $python_cmd"
         "${python_cmd}" -u "${LAUNCH_SCRIPT}" "$@"
     fi
 
