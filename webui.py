@@ -12,9 +12,9 @@ startup_timer.record("launcher")
 
 print("initialize imports start")
 
-# initialize.imports()
+initialize.imports()
 print("initialize imports done")
-# initialize.check_versions()
+initialize.check_versions()
 
 
 def create_api(app):
